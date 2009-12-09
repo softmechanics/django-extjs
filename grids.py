@@ -90,10 +90,26 @@ class ModelGrid(object):
         #for field in self.model:
         #    print field
         
-    def to_grid(self, queryset, start = 0, limit = 0, totalcount = None, json_add = "", colModel = None):
-        if not totalcount: 
-            totalcount = queryset.count()
-            #print 'totalcount', totalcount
+    def to_grid(self, request, queryset = None, json_add = "", colModel = None):
+        def p(name, default):
+          return request.POST.get(name, default)
+
+        start = p("start", 0)
+        limit = p("limit", 15)
+        sort = p("sort", "id")
+        dir = p("dir", "ASC")
+
+        if None == queryset:
+          queryset = self.model.objects.all()
+
+        totalcount = queryset.count()
+
+        order = sort
+        if "DESC" == dir:
+          order = "-" + sort
+
+        queryset = queryset.order_by(order)
+
         json =  """{
             "success":true
             %s
@@ -102,10 +118,10 @@ class ModelGrid(object):
                 "totalProperty":"totalCount",
                "successProperty": "success",
                 "sortInfo":{
-                   "field": "id",
-                   "direction": "DESC"
+                   "field": "%s",
+                   "direction": "%s"
                 },
-                "fields":""" % json_add
+                "fields":""" % (json_add, sort, dir)
         
         base_fields = self.fields
         if colModel and colModel.get('fields'):
@@ -162,6 +178,10 @@ class ModelGrid(object):
         json += """\n,"totalCount":%s""" % totalcount
         json += "}\n"
         return json 
+
+    def __call__(self, request):
+      return utils.JsonResponse(self.to_grid(request))
+
     class Meta:
         pass
 

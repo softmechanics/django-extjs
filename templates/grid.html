@@ -1,0 +1,103 @@
+{% url django_extjs.example_views.test_grid as grid%}
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="/extjs/static/ext-3.0.3/resources/css/ext-all.css" /> 
+    <script type="text/javascript" src="/extjs/static/ext-3.0.3/adapter/ext/ext-base.js"></script>
+    <script type="text/javascript" src="/extjs/static/ext-3.0.3/ext-all-debug.js"></script>
+
+
+    <script type="text/javascript" src="/extjs/static/js/Ext.ux.DateTime.js"></script> 
+    <script type="text/javascript" src="/extjs/static/js/Ext.ux.AutoGridPanel.js"></script> 
+    <script type="text/javascript" src="/extjs/static/js/Ext.ux.DynamicGridPanel.js"></script> 
+    <script type="text/javascript" src="/extjs/static/js/Ext.ux.AutoGrid.js"></script> 
+    <script type="text/javascript" src="/extjs/static/js/Ext.ux.DjangoGrid.js"></script> 
+
+    <script language="javascript">
+      Ext.onReady(function() {});
+ 
+      // simplest example of a django generated Form (EmailFormExample)
+      // its loaded then displayed in a new window
+      function openGrid() {
+        // as loading is asynchronous you need to declare a callback
+        var w = new Ext.Window({
+            title:'simple django grid'
+            ,autoWidth:true
+            ,autoScroll:true
+            ,autoHeight:true
+        });
+
+        var pageSize = 5;
+
+        this.store = new Ext.data.Store({
+            proxy: new Ext.data.HttpProxy({url: "{{ grid }}"}),
+            reader: new Ext.data.JsonReader(),
+            remoteSort: true,
+            baseParams: {limit: pageSize},
+        });
+
+        this.store.load();
+
+        this.paging = new Ext.PagingToolbar({
+            pageSize: pageSize,
+            store: this.store,
+            displayInfo: true,
+            emptyMsg: 'Nothing to display'
+        });
+
+        var a = new Ext.ux.AutoGrid({
+            store: this.store,
+            selModel: new Ext.grid.RowSelectionModel({singleSelect:true}),
+            enableColLock:false,
+            loadMask: true,
+            autoHeight: true,
+            autoWidth: true,
+            bbar: this.paging,
+        });
+
+
+        w.add(a);
+        w.show();
+      }
+
+      function openGrid2() {
+        // as loading is asynchronous you need to declare a callback
+        var w = new Ext.Window({
+            title:'django grid'
+            ,autoWidth:true
+            ,autoScroll:true
+            ,autoHeight:true
+        });
+
+        grid = new Ext.ux.DjangoGrid({
+            url: "{{ grid }}",
+            pageSize: 5,
+        });
+
+        w.add(grid);
+        w.show();
+      }
+
+      function openGrid3() {
+        grid = new Ext.ux.DjangoGrid({
+            url: "{{ grid }}",
+            pageSize: 5,
+            renderTo: "grid",
+        });
+
+      }
+    </script>
+  </head>
+  <body>
+
+    <div id="form2"></div>
+    <div id="form3"></div>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <button onclick="openGrid()">load Grid</button><br><br>
+    <button onclick="openGrid2()">load Grid</button><br><br>
+    <button onclick="openGrid3()">load Grid</button><br><br>
+
+    <div id="grid"></div>
+  </body>
+</html>
+

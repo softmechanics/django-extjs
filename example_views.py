@@ -12,6 +12,8 @@ from django.http import Http404, HttpResponse, HttpResponseRedirect
 
 
 # import our stuff
+from django_extjs.models import *
+from django_extjs.grids import *
 from django_extjs.forms import ExtJsForm
 from django_extjs import utils 
 
@@ -160,5 +162,5 @@ def example_model(request):
         form = baseform(instance = instance, initial = initial)
     return utils.JsonResponse(form.as_extjs())
       
-    
-        
+test_grid = ModelGrid(Test)
+

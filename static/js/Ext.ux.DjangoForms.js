@@ -15,7 +15,7 @@
                 ,initComponent:function() {
                     if (this.showButtons) {
                         this.buttons = [
-                             {name:'submit', xtype:'button', iconCls:'icon-accept', text:'enregistrer', scope:this, handler:function(args) {this.submitForm();}}
+                             {name:'submit', xtype:'button', iconCls:'icon-accept', text:'submit', scope:this, handler:function(args) {this.submitForm();}}
                             ,{name:'reset', xtype:'button', iconCls:'icon-cancel', text:'reset',  scope:this, handler:function(args) {this.resetForm();}}
                         ]
                         }

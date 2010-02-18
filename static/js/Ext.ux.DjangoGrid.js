@@ -1,5 +1,16 @@
 Ext.namespace('Ext.ux');
 
+function defaultRowEditFormBuilder(url, data) {
+    if("function" == typeof(url))
+        url = url(data);
+
+    var form = new Ext.ux.DjangoForm({url:url, callback:function(){}});
+    form.on('submitSuccess', function () {
+        form.destroy();
+    });
+    return form;
+}
+
 Ext.ux.DjangoGrid = Ext.extend(Ext.ux.AutoGrid, {
 
     constructStore: function(url, pageSize) {
@@ -41,6 +52,29 @@ Ext.ux.DjangoGrid = Ext.extend(Ext.ux.AutoGrid, {
       }, config);
 
       Ext.ux.DjangoGrid.superclass.constructor.call(this, config);
-    },
-});
 
+      pager.on("change", function () { config.selModel.clearSelections(); });
+    },
+
+    rowFormUrl: function(rowData /* opt */) {
+        if(undefined == rowData)
+            rowData = this.getSelected();
+
+        // return url for selected row
+        return this.url + '/' + rowData.id + '/edit';
+    },
+
+    rowEditForm: function(rowData /* opt */, formBuilder /* opt */) {
+        if(undefined == rowData)
+            rowData = this.getSelected();
+        if(undefined == formBuilder)
+            formBuilder = defaultRowEditFormBuilder
+
+        var form = formBuilder(this.rowFormUrl(rowData), rowData);
+        form.on('submitSuccess', function() {
+            this.store.reload();
+        });
+        return form;
+    },
+
+});
